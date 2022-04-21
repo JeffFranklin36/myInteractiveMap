@@ -28,4 +28,31 @@ let userPopup= L.popup()
 
 console.log(getCoords());
 
-//finding 5 nearest businesses of a specific type
+//foursquare api code
+async function foursquare(business){
+  let userLocation = await getCoords()
+  let coordsString = `${userLocation[0]},${userLocation[1]}`
+  const options = {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      Authorization: 'fsq38E/GAmehKsjYRAvk3pKPu85GCIj2dCva6yRixLRBZtk='
+    }
+  };
+  fetch(`https://api.foursquare.com/v3/places/search?radius=100000&limit=5&ll=${coordsString}&categories${business}`, options)
+  let data = await response.json()
+
+
+  let markers = data.results.map((x)=>{
+     return {geocode: [x.geocodes.main.latitude, x.geocodes.main.longitude], name: x.name}
+  })
+  return markers
+}
+
+//Add FourSquare Markers:
+function addMarkers(results){
+  return results.map(x => L.marker(x.geocode).bindPopup(x.name))
+}
+
+
+// foursquare API Key DO NOT DELETE fsq38E/GAmehKsjYRAvk3pKPu85GCIj2dCva6yRixLRBZtk=
