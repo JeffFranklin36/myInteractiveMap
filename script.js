@@ -21,8 +21,9 @@ let userPopup= L.popup()
  .setLatLng(userLocation)
  .setContent('<p>You are Here</p>')
  .openOn(myMap)
-
-
+ const results = await foursquare('13032')
+ const markers = addMarkers(results)
+ L.layerGroup(markers).addTo(myMap)
 })();
 
 
@@ -39,20 +40,29 @@ async function foursquare(business){
       Authorization: 'fsq38E/GAmehKsjYRAvk3pKPu85GCIj2dCva6yRixLRBZtk='
     }
   };
-  fetch(`https://api.foursquare.com/v3/places/search?radius=100000&limit=5&ll=${coordsString}&categories${business}`, options)
+  let response = await fetch(`https://api.foursquare.com/v3/places/search?radius=100000&limit=5&ll=${coordsString}&categories${business}`, options)
   let data = await response.json()
-
-
   let markers = data.results.map((x)=>{
-     return {geocode: [x.geocodes.main.latitude, x.geocodes.main.longitude], name: x.name}
+    return {geocode: [x.geocodes.main.latitude, x.geocodes.main.longitude], name: x.name}
   })
   return markers
-}
+  }
+
+
+    // .then(response => {
+    //  response.json()
+    // })
+    // .then(data => {console.log(data.results)})
+    // .catch(err => console.error(err));
+
 
 //Add FourSquare Markers:
 function addMarkers(results){
   return results.map(x => L.marker(x.geocode).bindPopup(x.name))
 }
+
+
+
 
 
 // foursquare API Key DO NOT DELETE fsq38E/GAmehKsjYRAvk3pKPu85GCIj2dCva6yRixLRBZtk=
